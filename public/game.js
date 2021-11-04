@@ -36,7 +36,8 @@ var starfield;
 var charactersRemaining = 500;
 var charactersRemainingString = '';
 var charactersRemainingText;
-
+var timerString = '';
+var timerText;
 var lives;
 var enemyBullet;
 var firingTimer = 0;
@@ -111,6 +112,13 @@ function create() {
 		}
 	);
 
+	// Timer
+	timerString = "00:00:00"
+	timerText = game.add.text(10, 60, timerString, {
+		font: '34px Arial',
+		fill: '#fff',
+	});
+
 	//  Lives
 	lives = game.add.group();
 	game.add.text(game.world.width - 100, 10, 'Lives : ', {
@@ -141,7 +149,23 @@ function create() {
 	//  And some controls to play the game with
 	cursors = game.input.keyboard.createCursorKeys();
 	fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
 }
+function updateTime() {
+	var totalSeconds = game.time.totalElapsedSeconds();
+	
+	var minutes = Math.floor(totalSeconds / 60);
+	minutes = (minutes < 10) ? "0" + minutes : "" + minutes;
+
+	var seconds = Math.floor(totalSeconds % 60);
+	seconds = (seconds < 10) ? "0" + seconds : "" + seconds;
+	
+	var ms = Math.round(totalSeconds % 1 * 60);
+	ms = (ms < 10) ? "0" + ms : "" + ms;
+	timerString = "" + minutes + ":" + seconds +":" + ms;
+	timerText.text = timerString;
+}
+
 
 function createAlien(x, y, letters, move_speed) {
 	var bmd = game.add.bitmapData(75, 25, 'key');
@@ -149,15 +173,19 @@ function createAlien(x, y, letters, move_speed) {
 
 	var alien = aliens.create(x, y, bmd);
 	alien.anchor.setTo(0.5, 0.5);
-	alien.body.moves = false;
-	alien.MOVE_SPEED = move_speed;
+
+	alien.body.velocity.x = move_speed;
+	//alien.MOVE_SPEED = move_speed;
+	
 }
 
 function ingestMessage(message) {
 	console.log('ingesting ' + message);
 
-	var yPos = 50 + Math.random() * GAME_HEIGHT * 0.8;
-	var move_speed = Math.random() * 2;
+
+	var yPos = 50+ Math.random()*GAME_HEIGHT * .8;
+	var move_speed = -25 - 100*Math.random();
+
 	for (var i = 0; i < message.length / 3; i++) {
 		var letters = message.substring(i * 3, (i + 1) * 3);
 		//console.log(message.substring(i*3, (i+1)*3) + "+")
@@ -229,6 +257,7 @@ function update() {
 			null,
 			this
 		);
+
 		game.physics.arcade.overlap(
 			aliens,
 			leftWorldBound,
@@ -237,9 +266,8 @@ function update() {
 			this
 		);
 
-		aliens.forEach(function (a) {
-			a.x -= a.MOVE_SPEED;
-		});
+		updateTime();
+
 	}
 }
 
