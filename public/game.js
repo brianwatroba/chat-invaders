@@ -16,6 +16,8 @@ function preload() {
 	game.load.image('background', './assets/background2.png');
 }
 
+
+
 var player;
 var aliens;
 var bullets;
@@ -32,6 +34,7 @@ var enemyBullet;
 var firingTimer = 0;
 var stateText;
 var livingEnemies = [];
+var randomMessages = ["bacon", "omegalul", "how is this working", "please invest in my startup"]
 
 function create() {
 	game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -110,17 +113,35 @@ function create() {
 	fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 }
 
+function createAlien(x,y, letters) {
+	console.log("creating alien")
+	var bmd = game.add.bitmapData(75, 25, 'key');
+	bmd.text(letters, 0, 20, '25px Courier', 'rgb(255, 255, 255)');
+	
+	var alien = aliens.create(x * 45, y * 50, bmd);
+	alien.anchor.setTo(0.5, 0.5);
+	alien.animations.add('fly', [0, 1, 2, 3], 20, true);
+	alien.play('fly');
+	alien.body.moves = false;
+}
+
+function ingestMessage(message) {
+	console.log("ingesting " + message);
+
+	var xPos = Math.random()*10
+	var yPos = Math.random()*5
+	for (var i = 0; i < message.length / 3; i++) {
+		var letters = message.substring(i*3, (i+1)*3);
+		console.log(message.substring(i*3, (i+1)*3) + "+")
+		createAlien(xPos + (i * 1), yPos, letters)
+	}
+
+}
+
 function createAliens() {
 	for (var y = 0; y < 4; y++) {
-		for (var x = 0; x < 10; x++) {
-			var bmd = game.add.bitmapData(50, 50, 'key');
-    		bmd.text("TEST", 0, 50, '50px Courier', 'rgb(255, 255, 255)');
-			
-			var alien = aliens.create(x * 48, y * 50, bmd);
-			alien.anchor.setTo(0.5, 0.5);
-			alien.animations.add('fly', [0, 1, 2, 3], 20, true);
-			alien.play('fly');
-			alien.body.moves = false;
+		for (var x = 0; x < 5; x++) {
+			createAlien(x,y, "t");
 		}
 	}
 
@@ -300,3 +321,8 @@ function restart() {
 	//hides the text
 	stateText.visible = false;
 }
+
+setInterval(function(){ 
+	ingestMessage(randomMessages[Math.floor(Math.random() * randomMessages.length)] )
+ }, 1000);
+
