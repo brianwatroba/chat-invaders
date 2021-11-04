@@ -149,8 +149,8 @@ function createAlien(x,y, letters, move_speed) {
 	
 	var alien = aliens.create(x, y, bmd);
 	alien.anchor.setTo(0.5, 0.5);
-	alien.body.moves = false;
-	alien.MOVE_SPEED = move_speed;
+	alien.body.velocity.x = move_speed;
+	//alien.MOVE_SPEED = move_speed;
 	
 }
 
@@ -158,7 +158,7 @@ function ingestMessage(message) {
 	console.log("ingesting " + message);
 
 	var yPos = 50+ Math.random()*GAME_HEIGHT * .8;
-	var move_speed = Math.random() * 2;
+	var move_speed = -25 - 100*Math.random();
 	for (var i = 0; i < message.length / 3; i++) {
 		var letters = message.substring(i*3, (i+1)*3);
 		//console.log(message.substring(i*3, (i+1)*3) + "+")
@@ -231,7 +231,7 @@ function update() {
 			this
 		);
 		
-		aliens.forEach( function(a) {a.x-=a.MOVE_SPEED })
+		//aliens.forEach( function(a) {a.x-=a.MOVE_SPEED })
 
 		updateTime();
 	}
