@@ -31,7 +31,8 @@ var starfield;
 var charactersRemaining = 500;
 var charactersRemainingString = '';
 var charactersRemainingText;
-
+var timerString = '';
+var timerText;
 var lives;
 var enemyBullet;
 var firingTimer = 0;
@@ -86,6 +87,13 @@ function create() {
 		fill: '#fff',
 	});
 
+	// Timer
+	timerString = "00:00:00"
+	timerText = game.add.text(10, 60, timerString, {
+		font: '34px Arial',
+		fill: '#fff',
+	});
+
 	//  Lives
 	lives = game.add.group();
 	game.add.text(game.world.width - 100, 10, 'Lives : ', {
@@ -116,7 +124,23 @@ function create() {
 	//  And some controls to play the game with
 	cursors = game.input.keyboard.createCursorKeys();
 	fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+
 }
+function updateTime() {
+	var totalSeconds = game.time.totalElapsedSeconds();
+	
+	var minutes = Math.floor(totalSeconds / 60);
+	minutes = (minutes < 10) ? "0" + minutes : "" + minutes;
+
+	var seconds = Math.floor(totalSeconds % 60);
+	seconds = (seconds < 10) ? "0" + seconds : "" + seconds;
+	
+	var ms = Math.round(totalSeconds % 1 * 60);
+	ms = (ms < 10) ? "0" + ms : "" + ms;
+	timerString = "" + minutes + ":" + seconds +":" + ms;
+	timerText.text = timerString;
+}
+
 
 function createAlien(x,y, letters, move_speed) {
 	
@@ -208,6 +232,8 @@ function update() {
 		);
 		
 		aliens.forEach( function(a) {a.x-=a.MOVE_SPEED })
+
+		updateTime();
 	}
 }
 
