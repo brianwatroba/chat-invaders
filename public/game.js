@@ -28,9 +28,10 @@ var cursors;
 var fireButton;
 var explosions;
 var starfield;
-var score = 0;
-var scoreString = '';
-var scoreText;
+var charactersRemaining = 500;
+var charactersRemainingString = '';
+var charactersRemainingText;
+
 var lives;
 var enemyBullet;
 var firingTimer = 0;
@@ -78,9 +79,9 @@ function create() {
 
 	createAliens();
 
-	//  The score
-	scoreString = 'Score : ';
-	scoreText = game.add.text(10, 10, scoreString + score, {
+	//  The characters Remaining
+	charactersRemainingString = 'Characters Remaining: ';
+	charactersRemainingText = game.add.text(10, 10, charactersRemainingString + charactersRemaining, {
 		font: '34px Arial',
 		fill: '#fff',
 	});
@@ -132,7 +133,7 @@ function createAlien(x,y, letters, move_speed) {
 function ingestMessage(message) {
 	console.log("ingesting " + message);
 
-	var yPos = Math.random()*GAME_HEIGHT;
+	var yPos = 50+ Math.random()*GAME_HEIGHT * .8;
 	var move_speed = Math.random() * 2;
 	for (var i = 0; i < message.length / 3; i++) {
 		var letters = message.substring(i*3, (i+1)*3);
@@ -140,7 +141,6 @@ function ingestMessage(message) {
 
 		createAlien(GAME_WIDTH+ 100 + (i * 45), yPos, letters, move_speed);
 	}
-
 }
 
 function createAliens() {
@@ -183,9 +183,9 @@ function update() {
 		player.body.velocity.setTo(0, 0);
 
 		if (cursors.up.isDown) {
-			player.body.velocity.y = -200;
+			player.body.velocity.y = -250;
 		} else if (cursors.down.isDown) {
-			player.body.velocity.y = 200;
+			player.body.velocity.y = 250;
 		}
 
 		//  Firing?
@@ -223,9 +223,9 @@ function collisionHandler(bullet, alien) {
 	bullet.kill();
 	alien.kill();
 
-	//  Increase the score
-	score += 20;
-	scoreText.text = scoreString + score;
+	// Decrease the characters Remaning
+	charactersRemaining -= 3;
+	charactersRemainingText.text = "Characters Remaining: " + charactersRemaining;
 
 	//  And create an explosion :)
 	var explosion = explosions.getFirstExists(false);
@@ -233,8 +233,6 @@ function collisionHandler(bullet, alien) {
 	explosion.play('kaboom', 30, false, true);
 
 	if (aliens.countLiving() == 0) {
-		score += 1000;
-		scoreText.text = scoreString + score;
 
 		enemyBullets.callAll('kill', this);
 		stateText.text = ' You Won, \n Click to restart';
@@ -307,7 +305,7 @@ function fireBullet() {
 			bullet.reset(player.x, player.y + 8);
 			bullet.body.velocity.x = 400;
 			bullet.angle = 90;
-			bulletTime = game.time.now + 200;
+			bulletTime = game.time.now + 100;
 		}
 	}
 }
