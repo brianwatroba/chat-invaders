@@ -113,7 +113,10 @@ function create() {
 function createAliens() {
 	for (var y = 0; y < 4; y++) {
 		for (var x = 0; x < 10; x++) {
-			var alien = aliens.create(x * 48, y * 50, 'invader');
+			var bmd = game.add.bitmapData(50, 50, 'key');
+    		bmd.text("TEST", 0, 50, '50px Courier', 'rgb(255, 255, 255)');
+			
+			var alien = aliens.create(x * 48, y * 50, bmd);
 			alien.anchor.setTo(0.5, 0.5);
 			alien.animations.add('fly', [0, 1, 2, 3], 20, true);
 			alien.play('fly');
