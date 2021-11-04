@@ -28,6 +28,7 @@ var player;
 var aliens;
 var bullets;
 var bulletTime = 0;
+var leftWorldBound;
 var cursors;
 var fireButton;
 var explosions;
@@ -85,6 +86,16 @@ function create() {
 	aliens = game.add.group();
 	aliens.enableBody = true;
 	aliens.physicsBodyType = Phaser.Physics.ARCADE;
+
+	leftWorldBound = game.add.graphics(0, 0);
+	leftWorldBound.lineStyle(1, 0xfd02eb, 0);
+	leftWorldBound.moveTo(0, 0);
+	leftWorldBound.lineTo(0, GAME_HEIGHT);
+	leftWorldBound.anchor.setTo(0.5, 0.5);
+	game.physics.arcade.enable(leftWorldBound);
+	leftWorldBound.enableBody = true;
+
+	player.anchor.setTo(0, 0);
 
 	createAliens();
 
@@ -218,6 +229,13 @@ function update() {
 			null,
 			this
 		);
+		game.physics.arcade.overlap(
+			aliens,
+			leftWorldBound,
+			wordHitsEnd,
+			null,
+			this
+		);
 
 		aliens.forEach(function (a) {
 			a.x -= a.MOVE_SPEED;
@@ -249,6 +267,31 @@ function collisionHandler(bullet, alien) {
 	if (aliens.countLiving() == 0) {
 		enemyBullets.callAll('kill', this);
 		stateText.text = ' You Won, \n Click to restart';
+		stateText.visible = true;
+
+		//the "click to restart" handler
+		game.input.onTap.addOnce(restart, this);
+	}
+}
+
+function wordHitsEnd(leftWorldBound, alien) {
+	alien.kill();
+
+	var explosion = explosions.getFirstExists(false);
+	explosion.reset(alien.body.x, alien.body.y);
+	explosion.play('kaboom', 30, false, true);
+
+	live = lives.getFirstAlive();
+
+	if (live) {
+		live.kill();
+	}
+
+	if (lives.countLiving() < 1) {
+		player.kill();
+		enemyBullets.callAll('kill');
+
+		stateText.text = ' GAME OVER \n Click to restart';
 		stateText.visible = true;
 
 		//the "click to restart" handler
