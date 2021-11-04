@@ -1,4 +1,6 @@
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'phaser-example', {
+var GAME_WIDTH = 800;
+var GAME_HEIGHT = 600;
+var game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO, 'phaser-example', {
 	preload: preload,
 	create: create,
 	update: update,
@@ -40,7 +42,7 @@ function create() {
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 
 	//  The scrolling starfield background
-	starfield = game.add.tileSprite(0, 0, 800, 600, 'starfield');
+	starfield = game.add.tileSprite(0, 0, GAME_WIDTH, GAME_HEIGHT, 'starfield');
 
 	//  Our bullet group
 	bullets = game.add.group();
@@ -53,6 +55,7 @@ function create() {
 	bullets.setAll('checkWorldBounds', true);
 
 	// The enemy's bullets
+	
 	enemyBullets = game.add.group();
 	enemyBullets.enableBody = true;
 	enemyBullets.physicsBodyType = Phaser.Physics.ARCADE;
@@ -63,8 +66,9 @@ function create() {
 	enemyBullets.setAll('checkWorldBounds', true);
 
 	//  The hero!
-	player = game.add.sprite(400, 500, 'ship');
+	player = game.add.sprite(50, 500, 'ship');
 	player.anchor.setTo(0.5, 0.5);
+	player.angle = 90;
 	game.physics.enable(player, Phaser.Physics.ARCADE);
 
 	//  The baddies!
@@ -113,33 +117,34 @@ function create() {
 	fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 }
 
-function createAlien(x,y, letters) {
-	console.log("creating alien")
+function createAlien(x,y, letters, move_speed) {
+	
 	var bmd = game.add.bitmapData(75, 25, 'key');
 	bmd.text(letters, 0, 20, '25px Courier', 'rgb(255, 255, 255)');
 	
-	var alien = aliens.create(x * 45, y * 50, bmd);
+	var alien = aliens.create(x, y, bmd);
 	alien.anchor.setTo(0.5, 0.5);
-	alien.animations.add('fly', [0, 1, 2, 3], 20, true);
-	alien.play('fly');
 	alien.body.moves = false;
+	alien.MOVE_SPEED = move_speed;
+	
 }
 
 function ingestMessage(message) {
 	console.log("ingesting " + message);
 
-	var xPos = Math.random()*10
-	var yPos = Math.random()*5
+	var yPos = Math.random()*GAME_HEIGHT;
+	var move_speed = Math.random() * 2;
 	for (var i = 0; i < message.length / 3; i++) {
 		var letters = message.substring(i*3, (i+1)*3);
-		console.log(message.substring(i*3, (i+1)*3) + "+")
-		createAlien(xPos + (i * 1), yPos, letters)
+		//console.log(message.substring(i*3, (i+1)*3) + "+")
+
+		createAlien(GAME_WIDTH+ 100 + (i * 45), yPos, letters, move_speed);
 	}
 
 }
 
 function createAliens() {
-	for (var y = 0; y < 4; y++) {
+	/*for (var y = 0; y < 4; y++) {
 		for (var x = 0; x < 5; x++) {
 			createAlien(x,y, "t");
 		}
@@ -155,6 +160,8 @@ function createAliens() {
 
 	//  When the tween loops it calls descend
 	tween.onLoop.add(descend, this);
+
+	*/
 }
 
 function setupInvader(invader) {
@@ -169,16 +176,16 @@ function descend() {
 
 function update() {
 	//  Scroll the background
-	starfield.tilePosition.y += 2;
+	starfield.tilePosition.x -= 2;
 
 	if (player.alive) {
 		//  Reset the player, then check for movement keys
 		player.body.velocity.setTo(0, 0);
 
-		if (cursors.left.isDown) {
-			player.body.velocity.x = -200;
-		} else if (cursors.right.isDown) {
-			player.body.velocity.x = 200;
+		if (cursors.up.isDown) {
+			player.body.velocity.y = -200;
+		} else if (cursors.down.isDown) {
+			player.body.velocity.y = 200;
 		}
 
 		//  Firing?
@@ -187,7 +194,7 @@ function update() {
 		}
 
 		if (game.time.now > firingTimer) {
-			enemyFires();
+			//enemyFires();
 		}
 
 		//  Run collision
@@ -199,6 +206,8 @@ function update() {
 			null,
 			this
 		);
+		
+		aliens.forEach( function(a) {a.x-=a.MOVE_SPEED })
 	}
 }
 
@@ -296,7 +305,8 @@ function fireBullet() {
 		if (bullet) {
 			//  And fire it
 			bullet.reset(player.x, player.y + 8);
-			bullet.body.velocity.y = -400;
+			bullet.body.velocity.x = 400;
+			bullet.angle = 90;
 			bulletTime = game.time.now + 200;
 		}
 	}
