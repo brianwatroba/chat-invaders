@@ -1,11 +1,17 @@
 var GAME_WIDTH = 800;
 var GAME_HEIGHT = 600;
-var game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO, 'phaser-example', {
-	preload: preload,
-	create: create,
-	update: update,
-	render: render,
-});
+var game = new Phaser.Game(
+	GAME_WIDTH,
+	GAME_HEIGHT,
+	Phaser.AUTO,
+	'phaser-example',
+	{
+		preload: preload,
+		create: create,
+		update: update,
+		render: render,
+	}
+);
 
 function preload() {
 	console.log('preloading');
@@ -17,8 +23,6 @@ function preload() {
 	game.load.image('starfield', './assets/starfield.png');
 	game.load.image('background', './assets/background2.png');
 }
-
-
 
 var player;
 var aliens;
@@ -37,7 +41,12 @@ var enemyBullet;
 var firingTimer = 0;
 var stateText;
 var livingEnemies = [];
-var randomMessages = ["bacon", "omegalul", "how is this working", "please invest in my startup"]
+var randomMessages = [
+	'bacon',
+	'omegalul',
+	'how is this working',
+	'please invest in my startup',
+];
 
 function create() {
 	game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -56,7 +65,7 @@ function create() {
 	bullets.setAll('checkWorldBounds', true);
 
 	// The enemy's bullets
-	
+
 	enemyBullets = game.add.group();
 	enemyBullets.enableBody = true;
 	enemyBullets.physicsBodyType = Phaser.Physics.ARCADE;
@@ -81,10 +90,15 @@ function create() {
 
 	//  The characters Remaining
 	charactersRemainingString = 'Characters Remaining: ';
-	charactersRemainingText = game.add.text(10, 10, charactersRemainingString + charactersRemaining, {
-		font: '34px Arial',
-		fill: '#fff',
-	});
+	charactersRemainingText = game.add.text(
+		10,
+		10,
+		charactersRemainingString + charactersRemaining,
+		{
+			font: '34px Arial',
+			fill: '#fff',
+		}
+	);
 
 	//  Lives
 	lives = game.add.group();
@@ -118,28 +132,26 @@ function create() {
 	fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 }
 
-function createAlien(x,y, letters, move_speed) {
-	
+function createAlien(x, y, letters, move_speed) {
 	var bmd = game.add.bitmapData(75, 25, 'key');
 	bmd.text(letters, 0, 20, '25px Courier', 'rgb(255, 255, 255)');
-	
+
 	var alien = aliens.create(x, y, bmd);
 	alien.anchor.setTo(0.5, 0.5);
 	alien.body.moves = false;
 	alien.MOVE_SPEED = move_speed;
-	
 }
 
 function ingestMessage(message) {
-	console.log("ingesting " + message);
+	console.log('ingesting ' + message);
 
-	var yPos = 50+ Math.random()*GAME_HEIGHT * .8;
+	var yPos = 50 + Math.random() * GAME_HEIGHT * 0.8;
 	var move_speed = Math.random() * 2;
 	for (var i = 0; i < message.length / 3; i++) {
-		var letters = message.substring(i*3, (i+1)*3);
+		var letters = message.substring(i * 3, (i + 1) * 3);
 		//console.log(message.substring(i*3, (i+1)*3) + "+")
 
-		createAlien(GAME_WIDTH+ 100 + (i * 45), yPos, letters, move_speed);
+		createAlien(GAME_WIDTH + 100 + i * 45, yPos, letters, move_speed);
 	}
 }
 
@@ -182,9 +194,9 @@ function update() {
 		//  Reset the player, then check for movement keys
 		player.body.velocity.setTo(0, 0);
 
-		if (cursors.up.isDown) {
+		if (cursors.up.isDown && player.y > 30) {
 			player.body.velocity.y = -250;
-		} else if (cursors.down.isDown) {
+		} else if (cursors.down.isDown && player.y < GAME_HEIGHT - 30) {
 			player.body.velocity.y = 250;
 		}
 
@@ -206,8 +218,10 @@ function update() {
 			null,
 			this
 		);
-		
-		aliens.forEach( function(a) {a.x-=a.MOVE_SPEED })
+
+		aliens.forEach(function (a) {
+			a.x -= a.MOVE_SPEED;
+		});
 	}
 }
 
@@ -225,7 +239,7 @@ function collisionHandler(bullet, alien) {
 
 	// Decrease the characters Remaning
 	charactersRemaining -= 3;
-	charactersRemainingText.text = "Characters Remaining: " + charactersRemaining;
+	charactersRemainingText.text = 'Characters Remaining: ' + charactersRemaining;
 
 	//  And create an explosion :)
 	var explosion = explosions.getFirstExists(false);
@@ -233,7 +247,6 @@ function collisionHandler(bullet, alien) {
 	explosion.play('kaboom', 30, false, true);
 
 	if (aliens.countLiving() == 0) {
-
 		enemyBullets.callAll('kill', this);
 		stateText.text = ' You Won, \n Click to restart';
 		stateText.visible = true;
@@ -330,7 +343,8 @@ function restart() {
 	stateText.visible = false;
 }
 
-setInterval(function(){ 
-	ingestMessage(randomMessages[Math.floor(Math.random() * randomMessages.length)] )
- }, 1000);
-
+setInterval(function () {
+	ingestMessage(
+		randomMessages[Math.floor(Math.random() * randomMessages.length)]
+	);
+}, 1000);
