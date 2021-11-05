@@ -88,6 +88,7 @@ function create() {
 	aliens.enableBody = true;
 	aliens.physicsBodyType = Phaser.Physics.ARCADE;
 
+	// Left world border
 	leftWorldBound = game.add.graphics(0, 0);
 	leftWorldBound.lineStyle(1, 0xfd02eb, 0);
 	leftWorldBound.moveTo(0, 0);
@@ -95,10 +96,6 @@ function create() {
 	leftWorldBound.anchor.setTo(0.5, 0.5);
 	game.physics.arcade.enable(leftWorldBound);
 	leftWorldBound.enableBody = true;
-
-	player.anchor.setTo(0, 0);
-
-	createAliens();
 
 	//  The characters Remaining
 	charactersRemainingString = 'Characters Remaining: ';
@@ -113,7 +110,7 @@ function create() {
 	);
 
 	// Timer
-	timerString = "00:00:00"
+	timerString = '00:00:00';
 	timerText = game.add.text(10, 60, timerString, {
 		font: '34px Arial',
 		fill: '#fff',
@@ -134,6 +131,7 @@ function create() {
 	stateText.anchor.setTo(0.5, 0.5);
 	stateText.visible = false;
 
+	//	Player lives
 	for (var i = 0; i < 3; i++) {
 		var ship = lives.create(game.world.width - 100 + 30 * i, 60, 'ship');
 		ship.anchor.setTo(0.5, 0.5);
@@ -149,23 +147,21 @@ function create() {
 	//  And some controls to play the game with
 	cursors = game.input.keyboard.createCursorKeys();
 	fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-
 }
 function updateTime() {
 	var totalSeconds = game.time.totalElapsedSeconds();
-	
+
 	var minutes = Math.floor(totalSeconds / 60);
-	minutes = (minutes < 10) ? "0" + minutes : "" + minutes;
+	minutes = minutes < 10 ? '0' + minutes : '' + minutes;
 
 	var seconds = Math.floor(totalSeconds % 60);
-	seconds = (seconds < 10) ? "0" + seconds : "" + seconds;
-	
-	var ms = Math.round(totalSeconds % 1 * 60);
-	ms = (ms < 10) ? "0" + ms : "" + ms;
-	timerString = "" + minutes + ":" + seconds +":" + ms;
+	seconds = seconds < 10 ? '0' + seconds : '' + seconds;
+
+	var ms = Math.round((totalSeconds % 1) * 60);
+	ms = ms < 10 ? '0' + ms : '' + ms;
+	timerString = '' + minutes + ':' + seconds + ':' + ms;
 	timerText.text = timerString;
 }
-
 
 function createAlien(x, y, letters, move_speed) {
 	var bmd = game.add.bitmapData(75, 25, 'key');
@@ -175,44 +171,16 @@ function createAlien(x, y, letters, move_speed) {
 	alien.anchor.setTo(0.5, 0.5);
 
 	alien.body.velocity.x = move_speed;
-	//alien.MOVE_SPEED = move_speed;
-	
 }
 
 function ingestMessage(message) {
-	console.log('ingesting ' + message);
-
-
-	var yPos = 50+ Math.random()*GAME_HEIGHT * .8;
-	var move_speed = -25 - 100*Math.random();
+	var yPos = 50 + Math.random() * GAME_HEIGHT * 0.8;
+	var move_speed = -25 - 100 * Math.random();
 
 	for (var i = 0; i < message.length / 3; i++) {
 		var letters = message.substring(i * 3, (i + 1) * 3);
-		//console.log(message.substring(i*3, (i+1)*3) + "+")
-
 		createAlien(GAME_WIDTH + 100 + i * 45, yPos, letters, move_speed);
 	}
-}
-
-function createAliens() {
-	/*for (var y = 0; y < 4; y++) {
-		for (var x = 0; x < 5; x++) {
-			createAlien(x,y, "t");
-		}
-	}
-
-	aliens.x = 100;
-	aliens.y = 50;
-
-	//  All this does is basically start the invaders moving. Notice we're moving the Group they belong to, rather than the invaders directly.
-	var tween = game.add
-		.tween(aliens)
-		.to({ x: 200 }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
-
-	//  When the tween loops it calls descend
-	tween.onLoop.add(descend, this);
-
-	*/
 }
 
 function setupInvader(invader) {
@@ -230,7 +198,6 @@ function update() {
 	starfield.tilePosition.x -= 2;
 
 	if (player.alive) {
-		//  Reset the player, then check for movement keys
 		player.body.velocity.setTo(0, 0);
 
 		if (cursors.up.isDown && player.y > 30) {
@@ -239,13 +206,8 @@ function update() {
 			player.body.velocity.y = 250;
 		}
 
-		//  Firing?
 		if (fireButton.isDown) {
 			fireBullet();
-		}
-
-		if (game.time.now > firingTimer) {
-			//enemyFires();
 		}
 
 		//  Run collision
@@ -267,7 +229,6 @@ function update() {
 		);
 
 		updateTime();
-
 	}
 }
 
@@ -351,30 +312,6 @@ function enemyHitsPlayer(player, bullet) {
 
 		//the "click to restart" handler
 		game.input.onTap.addOnce(restart, this);
-	}
-}
-
-function enemyFires() {
-	//  Grab the first bullet we can from the pool
-	enemyBullet = enemyBullets.getFirstExists(false);
-
-	livingEnemies.length = 0;
-
-	aliens.forEachAlive(function (alien) {
-		// put every living enemy in an array
-		livingEnemies.push(alien);
-	});
-
-	if (enemyBullet && livingEnemies.length > 0) {
-		var random = game.rnd.integerInRange(0, livingEnemies.length - 1);
-
-		// randomly select one of them
-		var shooter = livingEnemies[random];
-		// And fire the bullet from this enemy
-		enemyBullet.reset(shooter.body.x, shooter.body.y);
-
-		game.physics.arcade.moveToObject(enemyBullet, player, 120);
-		firingTimer = game.time.now + 2000;
 	}
 }
 
