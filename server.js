@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/src'));
 
 const PORT = process.env.PORT || 5000;
 
@@ -10,5 +10,5 @@ app.listen(PORT, () => {
 });
 
 app.get('/', function (req, res) {
-	res.sendFile(__dirname + '/part10.html');
+	res.sendFile(__dirname + '/index.html');
 });
